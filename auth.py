@@ -9,10 +9,12 @@ import hashlib
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
 from botocore.exceptions import ClientError
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from typing import List
 import os,json
-
+from aiocache import caches
+import hashlib
+import numpy as np
 import asyncio
 
 load_dotenv()
@@ -55,15 +57,35 @@ if index_name not in pc.list_indexes().names():
     pc.create_index(
         name=index_name,
         dimension=1536,  # The dimension of the embeddings
-        metric='cosine',  # Similarity metric
+        metric='dotproduct',  # Similarity metric
         spec=ServerlessSpec(
         cloud="aws",
         region="us-east-1"
-    ) 
+    )
     )
 
 # Connect to the index
 index = pc.Index(index_name)
+
+
+# Configure Redis cache
+caches.set_config({
+    'default': {
+        'cache': "aiocache.RedisCache",
+        'endpoint': "127.0.0.1",
+        'port': 6379,
+        'timeout': 10,
+        'serializer': {
+            'class': "aiocache.serializers.JsonSerializer"
+        }
+    }
+})
+
+
+async def get_cache_key(query_embedding):
+    embedding_str = np.array(query_embedding).tobytes()
+    cache_key = hashlib.md5(embedding_str).hexdigest()
+    return cache_key
 
 # Pydantic Models for User Registration and Confirmation
 class UserRegistration(BaseModel):
@@ -105,6 +127,7 @@ async def create_query_embedding(query_text: str):
             input=query_text,
             model="text-embedding-ada-002"
         )
+        # print(response)
         return response.data[0].embedding
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to create query embedding: {str(e)}")
@@ -270,10 +293,13 @@ async def upload_files(file_locations:FileLocations, current_user: str = Depends
 
 @app.post("/upload_ocr/")
 async def process_ocr_document(file: UploadFile = File(...)):
+    # task_id = []
     try:
         content = await file.read()
         ocr_data = json.loads(content)
-
+        # task = process_ocr_data(ocr_data)
+        # task_id.append(task.id)
+        # return {"status": "OCR processing and embedding completed successfully."}
         pages = ocr_data['analyzeResult']['pages'][:10]
 
         # Process embeddings asynchronously for all pages
@@ -287,23 +313,45 @@ async def process_ocr_document(file: UploadFile = File(...)):
 async def query_ocr_data(query: str):
     try:
         # Create embedding for the query text
+        query = query.strip().lower()
         query_embedding = await create_query_embedding(query)
+        cache_key = await get_cache_key(query_embedding)
+        # Attempt to fetch cached results
+        cached_results = await caches.get('default').get(cache_key)
+        if cached_results:
+            return JSONResponse(cached_results)
+
 
         # Perform similarity search in Pinecone index
-        search_results = index.query(vector=query_embedding, top_k=10, include_metadata=True,include_values=True)
+        # search_results = index.query(vector=query_embedding, top_k=10, include_metadata=True,include_values=True)
+        search_results = index.query(vector=query_embedding, top_k=10,include_metadata=True)
+
+        # Prepare results to be cached
+        results = []
+        for match in search_results['matches']:
+            page_number = match['metadata']['page_number']
+            result = {
+                'score': match['score'],
+                'page_number': page_number,
+            }
+            results.append(result)
+
+        # Cache the results
+        await caches.get('default').set(cache_key, results, ttl=60*5)  # Cache for 5 minutes
+
 
         # Create a generator to yield results as they are processed
         async def result_generator():
             for match in search_results['matches']:
                 page_number = match['metadata']['page_number']
-                content_embeddings = match['values']
-                content = match['metadata']['content']
+                # content_embeddings = match['values']
+                # content = match['metadata']['content']
 
                 result = {
                     'score': match['score'],
                     'page_number': page_number,
-                    'vector_values': content_embeddings,
-                    'content': content
+                    # 'vector_values': content_embeddings,
+                    # 'content': content
                 }
                 
                 # Yield the result as a JSON string
