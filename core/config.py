@@ -16,6 +16,9 @@ def setup_env(app: FastAPI):
     app.state.REGION = os.getenv('REGION')
     app.state.SECRET_KEY = os.getenv('SECRET_KEY')
     app.state.ALGORITHM = "HS256"
+
+    app.state.redis_host = os.getenv('REDIS_HOST', 'localhost')
+    app.state.redis_port = os.getenv('REDIS_PORT', 6379)
     
 def setup_cognito(app: FastAPI):
     app.state.cognito_client = boto3.client('cognito-idp', region_name=app.state.REGION)
@@ -48,5 +51,5 @@ def setup_aclient(app: FastAPI):
 
 async def setup_redis_client(app: FastAPI):
     # Initialize Redis connection for rate limiting
-    app.state.redis_client = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+    app.state.redis_client = redis.Redis(host=app.state.redis_host, port=app.state.redis_port, db=0, decode_responses=True)
     await FastAPILimiter.init(app.state.redis_client)

@@ -9,8 +9,8 @@ def init_cache(app: FastAPI):
     caches.set_config({
          'default': {
             'cache': "aiocache.RedisCache",
-             'endpoint': "127.0.0.1",
-             'port': 6379,
+             'endpoint':app.state.redis_host,
+             'port': app.state.redis_port,
              'timeout': 10,
              'serializer': {
                  'class': "aiocache.serializers.JsonSerializer"
