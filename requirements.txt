@@ -32,6 +32,8 @@ ecdsa==0.19.0
 email_validator==2.2.0
 fastapi==0.112.1
 fastapi-limiter==0.1.6
+filelock==3.15.4
+flake8==5.0.4
 frozenlist==1.4.1
 greenlet==3.0.3
 h11==0.14.0
@@ -44,7 +46,10 @@ jiter==0.5.0
 jmespath==1.0.1
 kombu==5.4.0
 limits==3.13.0
+mccabe==0.7.0
 multidict==6.0.5
+mypy==1.11.2
+mypy-extensions==1.0.0
 numpy==2.1.0
 openai==1.42.0
 packaging==24.1
@@ -55,11 +60,15 @@ pinecone-plugin-interface==0.0.7
 pluggy==1.5.0
 prompt_toolkit==3.0.47
 pyasn1==0.6.0
+pycodestyle==2.9.1
 pycparser==2.22
 pydantic==2.8.2
 pydantic_core==2.20.1
+pyflakes==2.5.0
 pytest==8.3.2
+pytest-flake8==1.2.2
 pytest-mock==3.14.0
+pytest-mypy==0.10.3
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 python-jose==3.3.0
