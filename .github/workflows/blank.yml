@@ -56,7 +56,7 @@ jobs:
     - name: Build Docker image with Docker Compose
       run: |
         docker-compose -f docker-compose.yml build
-        docker tag tekocr:latest pradeeptyagi23/tekocr:latest
+        docker tag pradeeptyagi23/tekocr:latest pradeeptyagi23/tekocr:latest
 
     - name: Push Docker image to Docker Hub
       run: |
