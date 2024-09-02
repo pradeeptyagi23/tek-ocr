@@ -5,7 +5,6 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi_limiter.depends import RateLimiter
 from ocr.utils import embed_and_upsert_page, create_query_embedding
 from caching.cache import get_cache_key
-from aiocache import caches
 
 ocr_router = APIRouter()
 
@@ -45,7 +44,8 @@ async def process_ocr_document(
     pinecone_index=Depends(get_pinecone_index),
 ):
     """
-    Process and embed OCR data from an uploaded file and upsert the embeddings into Pinecone.
+    Process and embed OCR data from an uploaded file and
+    upsert the embeddings into Pinecone.
 
     Args:
         request (Request): The FastAPI request object.
