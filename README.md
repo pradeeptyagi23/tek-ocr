@@ -38,7 +38,58 @@ REDIS_PORT=6379
 
 ### Clone the repository
 
-```env
-git clone https://github.com/yourusername/yourrepository.git
-cd yourrepository
+```bash
+git clone https://github.com/pradeeptyagi23/tek-ocr.git
+cd tek-ocr
 ```
+
+### Build and start the application
+```bash
+docker-compose up --build
+```
+
+# Endpoints 
+The application provides the following endpoints:
+
+## Authentication Endpoints
+- **POST /auth/register** : Register a new user.
+- **POST /auth/confirm** : Confirm a user registration with a confirmation code.
+- **POST /auth/login** : Login with username and password to obtain a JWT token.
+
+## File Upload Endpoints
+- **POST /files/upload-files/** : Upload files to S3 and retrieve signed URLs.
+
+## OCR Processing Endpoints
+- **POST /ocr/processOCR** : Process an OCR document, generate embeddings, and store them in Pinecone.
+- **POST /ocr/queryOCR/** : Query OCR data by providing a search string.
+
+# Running Tests
+To run linting and type checking tests using `pytest`, use the following command:
+```bash
+pytest
+```
+
+# Configuration for Linting and Type Checking
+This project uses flake8 for linting and mypy for type checking. The configurations are set in pytest.ini as follows:
+
+```bash
+[pytest]
+pythonpath = .
+addopts = --mypy --flake8
+python_files = *.py
+
+[flake8]
+max-line-length = 88
+exclude = .git,__pycache__,old,build,dist
+
+[mypy]
+python_version = 3.11
+ignore_missing_imports = True
+strict = True
+```
+
+# Additional Information
+- **Docker Compose Version**: 3.8
+- **Python Version**: 3.11
+For further details on each module, refer to the source code documentation.
+
