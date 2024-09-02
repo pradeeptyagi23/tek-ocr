@@ -7,8 +7,9 @@ from passlib.context import CryptContext
 
 # Initialize OAuth2PasswordBearer and Cognito client
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
-cognito_client = boto3.client('cognito-idp', region_name="us-east-1")
+cognito_client = boto3.client("cognito-idp", region_name="us-east-1")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
@@ -23,6 +24,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     return pwd_context.verify(plain_password, hashed_password)
 
+
 def get_password_hash(password: str) -> str:
     """
     Hash a password.
@@ -35,7 +37,10 @@ def get_password_hash(password: str) -> str:
     """
     return pwd_context.hash(password)
 
-def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=15)) -> str:
+
+def create_access_token(
+    data: dict, expires_delta: timedelta = timedelta(minutes=15)
+) -> str:
     """
     Create an access token with an expiration time.
 
@@ -51,6 +56,7 @@ def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes
     encode_data.update({"exp": expire})
     encoded_jwt = jwt.encode(encode_data, "your-secret-key", algorithm="HS256")
     return encoded_jwt
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
     """

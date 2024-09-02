@@ -8,10 +8,10 @@ import aioboto3
 
 file_router = APIRouter()
 
-@file_router.post('/upload-files/')
+
+@file_router.post("/upload-files/")
 async def upload_files(
-    file_locations: FileLocations,
-    current_user: str = Depends(get_current_user)
+    file_locations: FileLocations, current_user: str = Depends(get_current_user)
 ):
     """
     Endpoint to upload multiple files and get signed URLs.
@@ -26,7 +26,7 @@ async def upload_files(
     signed_urls = []
 
     session = aioboto3.Session(region_name=os.getenv("AWS_REGION"))
-    async with session.client('s3') as s3_client:
+    async with session.client("s3") as s3_client:
         # Create a list of upload tasks
         upload_tasks = [
             upload_file_async(file_path.path, s3_client)

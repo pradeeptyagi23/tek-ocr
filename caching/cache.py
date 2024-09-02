@@ -5,6 +5,7 @@ import redis
 from fastapi_limiter import FastAPILimiter
 from fastapi import FastAPI
 
+
 def init_cache(app: FastAPI) -> None:
     """
     Initialize the cache configuration for the FastAPI application.
@@ -14,18 +15,19 @@ def init_cache(app: FastAPI) -> None:
 
     Sets the cache configuration using Redis and attaches it to the application state.
     """
-    caches.set_config({
-        'default': {
-            'cache': "aiocache.RedisCache",
-            'endpoint': app.state.redis_host,
-            'port': app.state.redis_port,
-            'timeout': 10,
-            'serializer': {
-                'class': "aiocache.serializers.JsonSerializer"
+    caches.set_config(
+        {
+            "default": {
+                "cache": "aiocache.RedisCache",
+                "endpoint": app.state.redis_host,
+                "port": app.state.redis_port,
+                "timeout": 10,
+                "serializer": {"class": "aiocache.serializers.JsonSerializer"},
             }
         }
-    })
-    app.state.caches = caches.get('default')
+    )
+    app.state.caches = caches.get("default")
+
 
 async def get_cache_key(query_embedding: np.ndarray) -> str:
     """

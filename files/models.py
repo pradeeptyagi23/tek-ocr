@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
+
 class FileLocation(BaseModel):
     """
     Model for representing a single file location.
@@ -9,8 +10,10 @@ class FileLocation(BaseModel):
         path (str): The file path.
         description (Optional[str]): An optional description of the file.
     """
+
     path: str
     description: Optional[str] = None
+
 
 class FileLocations(BaseModel):
     """
@@ -19,4 +22,5 @@ class FileLocations(BaseModel):
     Attributes:
         files (List[FileLocation]): A list of file locations.
     """
+
     files: List[FileLocation]

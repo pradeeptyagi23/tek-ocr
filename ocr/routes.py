@@ -9,6 +9,7 @@ from aiocache import caches
 
 ocr_router = APIRouter()
 
+
 def get_pinecone_index(request: Request):
     """
     Dependency to retrieve the Pinecone index from the application state.
@@ -20,6 +21,7 @@ def get_pinecone_index(request: Request):
         Pinecone index: The Pinecone index instance.
     """
     return request.app.state.pinecone_index
+
 
 def get_caches_obj(request: Request):
     """
@@ -33,11 +35,14 @@ def get_caches_obj(request: Request):
     """
     return request.app.state.caches
 
-@ocr_router.post("/processOCR", dependencies=[Depends(RateLimiter(times=1, seconds=180))])
+
+@ocr_router.post(
+    "/processOCR", dependencies=[Depends(RateLimiter(times=1, seconds=180))]
+)
 async def process_ocr_document(
     request: Request,
     file: UploadFile = File(...),
-    pinecone_index=Depends(get_pinecone_index)
+    pinecone_index=Depends(get_pinecone_index),
 ):
     """
     Process and embed OCR data from an uploaded file and upsert the embeddings into Pinecone.
@@ -56,21 +61,27 @@ async def process_ocr_document(
     try:
         content = await file.read()
         ocr_data = json.loads(content)
-        pages = ocr_data['analyzeResult']['pages'][:10]
+        pages = ocr_data["analyzeResult"]["pages"][:10]
 
         # Process embeddings asynchronously for all pages
-        await asyncio.gather(*(embed_and_upsert_page(page, pinecone_index, request.app) for page in pages))
+        await asyncio.gather(
+            *(
+                embed_and_upsert_page(page, pinecone_index, request.app)
+                for page in pages
+            )
+        )
 
         return {"status": "OCR processing and embedding completed successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @ocr_router.post("/queryOCR/")
 async def query_ocr_data(
     request: Request,
     query: str,
     pinecone_index=Depends(get_pinecone_index),
-    caches=Depends(get_caches_obj)
+    caches=Depends(get_caches_obj),
 ):
     """
     Query OCR data using the provided query text and return results from Pinecone index.
@@ -98,19 +109,18 @@ async def query_ocr_data(
             return JSONResponse(cached_results)
 
         # Perform similarity search in Pinecone index
-        search_results = pinecone_index.query(vector=query_embedding, top_k=10, include_metadata=True)
+        search_results = pinecone_index.query(
+            vector=query_embedding, top_k=10, include_metadata=True
+        )
 
         # Prepare results to be cached
         results = [
-            {
-                'score': match['score'],
-                'page_number': match['metadata']['page_number']
-            }
-            for match in search_results['matches']
+            {"score": match["score"], "page_number": match["metadata"]["page_number"]}
+            for match in search_results["matches"]
         ]
 
         # Cache the results
-        await caches.set(cache_key, results, ttl=60*5)  # Cache for 5 minutes
+        await caches.set(cache_key, results, ttl=60 * 5)  # Cache for 5 minutes
 
         async def result_generator():
             """
@@ -119,12 +129,12 @@ async def query_ocr_data(
             Yields:
                 bytes: A JSON-encoded result string for each match.
             """
-            for match in search_results['matches']:
+            for match in search_results["matches"]:
                 result = {
-                    'score': match['score'],
-                    'page_number': match['metadata']['page_number']
+                    "score": match["score"],
+                    "page_number": match["metadata"]["page_number"],
                 }
-                yield json.dumps(result, ensure_ascii=False).encode('utf-8') + b"\n"
+                yield json.dumps(result, ensure_ascii=False).encode("utf-8") + b"\n"
 
         return StreamingResponse(result_generator(), media_type="application/json")
 
