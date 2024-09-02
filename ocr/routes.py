@@ -4,6 +4,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi_limiter.depends import RateLimiter
 from ocr.utils import embed_and_upsert_page, create_query_embedding
+from auth.utils import get_current_user
 from caching.cache import get_cache_key
 from typing import Dict, Generator, Any
 from pinecone import Index
@@ -39,7 +40,7 @@ def get_caches_obj(request: Request) -> Cache:
 
 
 @ocr_router.post(
-    "/processOCR", dependencies=[Depends(RateLimiter(times=1, seconds=180))]
+    "/processOCR", dependencies=[Depends(RateLimiter(times=1, seconds=180)),Depends(get_current_user)]
 )
 async def process_ocr_document(
     request: Request,
@@ -79,12 +80,13 @@ async def process_ocr_document(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@ocr_router.post("/queryOCR/", response_model=None)
+@ocr_router.post("/queryOCR/",response_model=None)
 async def query_ocr_data(
     request: Request,
     query: str,
     pinecone_index: Index = Depends(get_pinecone_index),
     caches: Cache = Depends(get_caches_obj),
+    current_user: str = Depends(get_current_user)
 ) -> Any:
     """
     Query OCR data using the provided query text and return results from Pinecone index.
