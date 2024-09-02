@@ -5,11 +5,14 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi_limiter.depends import RateLimiter
 from ocr.utils import embed_and_upsert_page, create_query_embedding
 from caching.cache import get_cache_key
+from typing import Dict, Generator, Any
+from pinecone import Index
+from aiocache import Cache
 
 ocr_router = APIRouter()
 
 
-def get_pinecone_index(request: Request):
+def get_pinecone_index(request: Request) -> Index:
     """
     Dependency to retrieve the Pinecone index from the application state.
 
@@ -22,7 +25,7 @@ def get_pinecone_index(request: Request):
     return request.app.state.pinecone_index
 
 
-def get_caches_obj(request: Request):
+def get_caches_obj(request: Request) -> Cache:
     """
     Dependency to retrieve the cache object from the application state.
 
@@ -41,8 +44,8 @@ def get_caches_obj(request: Request):
 async def process_ocr_document(
     request: Request,
     file: UploadFile = File(...),
-    pinecone_index=Depends(get_pinecone_index),
-):
+    pinecone_index: Index = Depends(get_pinecone_index),
+) -> Dict[str, str]:
     """
     Process and embed OCR data from an uploaded file and
     upsert the embeddings into Pinecone.
@@ -76,13 +79,13 @@ async def process_ocr_document(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@ocr_router.post("/queryOCR/")
+@ocr_router.post("/queryOCR/", response_model=None)
 async def query_ocr_data(
     request: Request,
     query: str,
-    pinecone_index=Depends(get_pinecone_index),
-    caches=Depends(get_caches_obj),
-):
+    pinecone_index: Index = Depends(get_pinecone_index),
+    caches: Cache = Depends(get_caches_obj),
+) -> Any:
     """
     Query OCR data using the provided query text and return results from Pinecone index.
 
@@ -122,9 +125,10 @@ async def query_ocr_data(
         # Cache the results
         await caches.set(cache_key, results, ttl=60 * 5)  # Cache for 5 minutes
 
-        async def result_generator():
+        async def result_generator() -> Generator[bytes, None, None]:  # type: ignore
             """
             Generator to yield search results as JSON strings.
+
 
             Yields:
                 bytes: A JSON-encoded result string for each match.

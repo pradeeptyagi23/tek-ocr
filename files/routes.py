@@ -5,7 +5,7 @@ from auth.utils import get_current_user
 import os
 import asyncio
 import aioboto3
-from typing import Dict
+from typing import Dict, List
 
 file_router = APIRouter()
 
@@ -13,7 +13,7 @@ file_router = APIRouter()
 @file_router.post("/upload-files/")
 async def upload_files(
     file_locations: FileLocations, current_user: str = Depends(get_current_user)
-) -> Dict[str, str]:
+) -> Dict[str, List[str]]:
     """
     Endpoint to upload multiple files and get signed URLs.
 

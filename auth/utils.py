@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
-from typing import Any
+from typing import Dict, Any
 
 # Initialize OAuth2PasswordBearer and Cognito client
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
@@ -40,7 +40,7 @@ def get_password_hash(password: str) -> Any:
 
 
 def create_access_token(
-    data: dict, expires_delta: timedelta = timedelta(minutes=15)
+    data: Dict[str, Any], expires_delta: timedelta = timedelta(minutes=15)
 ) -> Any:
     """
     Create an access token with an expiration time.

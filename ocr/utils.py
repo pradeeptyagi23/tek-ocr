@@ -1,7 +1,11 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, FastAPI
+from typing import Dict, Any
+from pinecone import Index
 
 
-async def embed_and_upsert_page(page, index, app):
+async def embed_and_upsert_page(
+    page: Dict[str, Any], index: Index, app: FastAPI
+) -> None:
     """
     Embeds the content of a single page and upserts
     the embedding into the Pinecone index.
@@ -38,7 +42,7 @@ async def embed_and_upsert_page(page, index, app):
         )
 
 
-async def create_query_embedding(query_text: str, app):
+async def create_query_embedding(query_text: str, app: FastAPI) -> Any:
     """
     Creates an embedding for the provided query text.
 

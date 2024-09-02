@@ -1,6 +1,7 @@
 import hashlib
 from aiocache import caches
 import numpy as np
+from numpy.typing import NDArray
 from fastapi import FastAPI
 
 
@@ -27,7 +28,7 @@ def init_cache(app: FastAPI) -> None:
     app.state.caches = caches.get("default")
 
 
-async def get_cache_key(query_embedding: np.ndarray) -> str:
+async def get_cache_key(query_embedding: NDArray[np.float64]) -> str:
     """
     Generate a cache key from a query embedding.
 
