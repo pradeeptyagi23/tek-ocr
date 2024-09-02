@@ -4,6 +4,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
+from typing import Any
 
 # Initialize OAuth2PasswordBearer and Cognito client
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
@@ -11,7 +12,7 @@ cognito_client = boto3.client("cognito-idp", region_name="us-east-1")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
+def verify_password(plain_password: str, hashed_password: str) -> Any:
     """
     Verify if a plain password matches a hashed password.
 
@@ -25,7 +26,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_password_hash(password: str) -> str:
+def get_password_hash(password: str) -> Any:
     """
     Hash a password.
 
@@ -40,7 +41,7 @@ def get_password_hash(password: str) -> str:
 
 def create_access_token(
     data: dict, expires_delta: timedelta = timedelta(minutes=15)
-) -> str:
+) -> Any:
     """
     Create an access token with an expiration time.
 
@@ -69,7 +70,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
         str: The username extracted from the token.
 
     Raises:
-        HTTPException: If the token is invalid or the credentials could not be validated.
+        HTTPException: If the token is invalid or the
+        credentials could not be validated.
     """
     try:
         payload = jwt.decode(token, "your-secret-key", algorithms=["HS256"])

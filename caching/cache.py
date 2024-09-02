@@ -1,8 +1,6 @@
 import hashlib
 from aiocache import caches
 import numpy as np
-import redis
-from fastapi_limiter import FastAPILimiter
 from fastapi import FastAPI
 
 

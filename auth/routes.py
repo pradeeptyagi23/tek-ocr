@@ -3,11 +3,12 @@ from auth.models import UserRegistration, UserConfirmation, Token
 from auth.utils import create_access_token, cognito_client
 from fastapi.security import OAuth2PasswordRequestForm
 from botocore.exceptions import ClientError
+from typing import Dict, Any
 
 auth_router = APIRouter()
 
 
-def get_client_index(request: Request) -> str:
+def get_client_index(request: Request) -> Any:
     """
     Dependency to get the CLIENT_ID from the app state.
 
@@ -23,7 +24,7 @@ def get_client_index(request: Request) -> str:
 @auth_router.post("/register/")
 async def register_user(
     user: UserRegistration, client_id: str = Depends(get_client_index)
-) -> dict:
+) -> Dict[str, str]:
     """
     Register a new user.
 
@@ -51,6 +52,7 @@ async def register_user(
             "user_sub": response["UserSub"],
         }
     except ClientError as e:
+        print(str(e))
         raise HTTPException(status_code=400, detail=e.response["Error"]["Message"])
 
 
@@ -58,7 +60,7 @@ async def register_user(
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     client_id: str = Depends(get_client_index),
-) -> Token:
+) -> Dict[str, str]:
     """
     Authenticate a user and return an access token.
 
@@ -82,6 +84,7 @@ async def login(
                 "PASSWORD": form_data.password,
             },
         )
+        print(f"{response}")
         # access_token = response["AuthenticationResult"]["AccessToken"]
         token_data = {"sub": form_data.username}
         jwt_token = create_access_token(token_data)
@@ -95,7 +98,7 @@ async def login(
 @auth_router.post("/confirm/")
 async def confirm_user(
     user: UserConfirmation, client_id: str = Depends(get_client_index)
-) -> dict:
+) -> Dict[str, str]:
     """
     Confirm a user's registration with a confirmation code.
 

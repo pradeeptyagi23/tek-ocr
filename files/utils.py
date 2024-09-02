@@ -1,6 +1,7 @@
 import hashlib
 import os
 from fastapi import HTTPException
+from typing import Any
 
 # AWS S3 Configuration
 bucket_name = "tek-file-bucket"
@@ -31,7 +32,7 @@ async def file_exists(s3_client, file_key: str) -> bool:
             raise HTTPException(status_code=500, detail="Error checking file existence")
 
 
-async def upload_file_async(file_path: str, s3_client) -> str:
+async def upload_file_async(file_path: str, s3_client) -> Any:
     """
     Upload a file to S3 asynchronously and return a signed URL.
 

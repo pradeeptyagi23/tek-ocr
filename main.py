@@ -11,15 +11,12 @@ from core.config import (
 )
 from caching.cache import init_cache
 from contextlib import asynccontextmanager
-import redis
-from fastapi_limiter import FastAPILimiter
-from aiocache import caches
 
 app = FastAPI()
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> None:  # type: ignore
     """
     Application lifespan context manager for setting up and tearing down
     application state and resources.

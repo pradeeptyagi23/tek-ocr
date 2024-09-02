@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 import redis.asyncio as redis
 from fastapi_limiter import FastAPILimiter
-from contextlib import asynccontextmanager
 from pinecone import Pinecone, ServerlessSpec
 from openai import AsyncOpenAI
 import boto3
