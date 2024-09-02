@@ -70,7 +70,8 @@ async def login(
         Token: The JWT access token.
 
     Raises:
-        HTTPException: If there is an error with the Cognito client or authentication fails.
+        HTTPException: If there is an error with the
+        Cognito client or authentication fails.
     """
     try:
         response = cognito_client.initiate_auth(
@@ -81,7 +82,7 @@ async def login(
                 "PASSWORD": form_data.password,
             },
         )
-        access_token = response["AuthenticationResult"]["AccessToken"]
+        # access_token = response["AuthenticationResult"]["AccessToken"]
         token_data = {"sub": form_data.username}
         jwt_token = create_access_token(token_data)
         return {"access_token": jwt_token, "token_type": "bearer"}
@@ -114,7 +115,7 @@ async def confirm_user(
             Username=user.email,
             ConfirmationCode=user.confirmation_code,
         )
-        return {"message": "User confirmed successfully"}
+        return {"message": f"User confirmed successfully {response}"}
     except ClientError as e:
         print(str(e))
         raise HTTPException(status_code=400, detail=e.response["Error"]["Message"])
