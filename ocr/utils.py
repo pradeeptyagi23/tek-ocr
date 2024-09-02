@@ -3,7 +3,8 @@ from fastapi import HTTPException
 
 async def embed_and_upsert_page(page, index, app):
     """
-    Embeds the content of a single page and upserts the embedding into the Pinecone index.
+    Embeds the content of a single page and upserts 
+    the embedding into the Pinecone index.
 
     Args:
         page (dict): The page object containing content and metadata.
