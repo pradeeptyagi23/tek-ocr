@@ -23,6 +23,7 @@ Before you begin, ensure you have the following:
 ### Environment Variables
 
 Create a `.env` file in the root directory of your project. The file should contain the following environment variables:
+.env.example in the root folder can be used to replace the actual values 
 
 ```env
 AWS_ACCESS_KEY_ID=<your_aws_access_key>
