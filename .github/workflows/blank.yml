@@ -24,10 +24,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-<<<<<<< HEAD
         # Install dependencies from requirements.txt or pyproject.toml
-=======
->>>>>>> 39065188b9a10d045a12d56da007881efe2b99ac
         if [ -f requirements.txt ]; then
           pip install -r requirements.txt
         elif [ -f pyproject.toml ]; then
