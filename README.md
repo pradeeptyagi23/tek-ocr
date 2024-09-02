@@ -41,7 +41,7 @@ REDIS_PORT=6379
 
 ```bash
 git clone https://github.com/pradeeptyagi23/tek-ocr.git
-cd tek-ocr
+cd tek-ocr && git checkout master
 ```
 
 ### Build and start the application
