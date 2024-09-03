@@ -37,6 +37,20 @@ REDIS_HOST=redis-server
 REDIS_PORT=6379
 ```
 
+
+# CI/CD Pipeline with GitHub Actions
+
+This project is integrated with GitHub Actions for continuous integration and deployment. The workflow is triggered on every push and pull request to the `main` branch. The workflow performs the following steps:
+
+1. **Linting and Type Checking**: The codebase is checked for linting errors using `flake8` and type issues using `mypy`.
+2. **Docker Image Build**: If all checks pass, a Docker image is built using the `docker-compose.yml` file located in the project root directory.
+3. **Docker Image Push**: The built Docker image is pushed to Docker Hub under the repository configured in the GitHub Secrets.
+
+# Running the application
+There are 2 ways to run the application. 
+
+- **Download source code, build and run**
+Follow below steps
 ### Clone the repository
 
 ```bash
@@ -48,7 +62,21 @@ cd tek-ocr
 ```bash
 docker-compose up --build
 ```
+- **Pull the docker images from dockerhub and run the containers**
+To directly pull the docker image from the dockerhub, execute the following commands
+```bash
+1. **Pull the Docker Image**:
 
+   ```bash
+# Create a common network to run the redis container and the application container
+ docker network create teknw #if not already created
+
+ # Run the redis container as service name redis-server
+ docker run -d --name redis-server --network teknw redis:latest
+
+ #Run the application container
+ docker run --network teknw --env-file .env -p 8000:8000 pradeeptyagi23/tekocr:latest
+```
 # Endpoints 
 The application provides the following endpoints:
 
