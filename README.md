@@ -65,9 +65,6 @@ docker-compose up --build
 - **Pull the docker images from dockerhub and run the containers**
 To directly pull the docker image from the dockerhub, execute the following commands
 ```bash
-1. **Pull the Docker Image**:
-
-   ```bash
 # Create a common network to run the redis container and the application container
  docker network create teknw #if not already created
 
