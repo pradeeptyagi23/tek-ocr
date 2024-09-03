@@ -27,7 +27,7 @@ def setup_env(app: FastAPI) -> None:
 
     app.state.redis_host = os.getenv("REDIS_HOST", "localhost")
     app.state.redis_port = int(os.getenv("REDIS_PORT", 6379))
-    app.state.pinecone_page_count = os.getenv("PINECONE_PAGE_COUNT", 10)
+    app.state.pinecone_page_count = int(os.getenv("PINECONE_PAGE_COUNT", 10))
 
 
 def setup_cognito(app: FastAPI) -> None:
