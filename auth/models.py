@@ -21,7 +21,7 @@ class UserConfirmation(BaseModel):
     Model for user confirmation data.
 
     Attributes:
-        email (EmailStr): The email address of the user.
+        Email (EmailStr): The email address of the user.
         confirmation_code (str): The confirmation code sent to the user.
     """
 
