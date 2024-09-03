@@ -40,7 +40,8 @@ def get_caches_obj(request: Request) -> Cache:
 
 
 @ocr_router.post(
-    "/processOCR", dependencies=[Depends(RateLimiter(times=1, seconds=180)),Depends(get_current_user)]
+    "/processOCR", dependencies=[Depends(RateLimiter(times=1, seconds=180)),
+                                 Depends(get_current_user)]
 )
 async def process_ocr_document(
     request: Request,
@@ -80,7 +81,7 @@ async def process_ocr_document(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@ocr_router.post("/queryOCR/",response_model=None)
+@ocr_router.post("/queryOCR/", response_model=None)
 async def query_ocr_data(
     request: Request,
     query: str,
