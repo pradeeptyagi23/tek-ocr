@@ -66,7 +66,8 @@ async def process_ocr_document(
     try:
         content = await file.read()
         ocr_data = json.loads(content)
-        pages = ocr_data["analyzeResult"]["pages"][:10]
+        page_count = request.app.state.pinecone_page_count
+        pages = ocr_data["analyzeResult"]["pages"][:page_count]
 
         # Process embeddings asynchronously for all pages
         await asyncio.gather(

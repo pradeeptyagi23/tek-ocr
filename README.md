@@ -35,6 +35,7 @@ PINECONE_API_KEY=<your_pinecone_api_key>
 PINECONE_ENV=<your_pinecone_environment>
 REDIS_HOST=redis-server
 REDIS_PORT=6379
+PINECONE_PAGE_COUNT=10
 ```
 
 
